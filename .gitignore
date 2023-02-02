@@ -1,4 +1,12 @@
+/*
 
 !.gitignore
+
+!lab*/
+lab*/gen/*
+
+!final/
+final/gen/*
+
 
 !**/.gitkeep
