@@ -3,10 +3,10 @@
 !.gitignore
 
 !lab*/
-lab*/gen/*
+lab*/work/*
 
 !final/
-final/gen/*
+final/work/*
 
 
 !**/.gitkeep
