@@ -19,6 +19,9 @@ csa: compile
 csasimple: compile
 	bsc -sim -e mkTbCSASimple -bdir ../work -info-dir ../work -simdir ../work -o ../work/simCsaSimple ../work/*.ba
 
+bs: compile
+	bsc -sim -e mkTbBS -bdir ../work -info-dir ../work -simdir ../work -o ../work/simBs ../work/*.ba
+
 all: mux muxsimple rca rcasimple csa csasimple
 
 clean:
