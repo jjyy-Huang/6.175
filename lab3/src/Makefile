@@ -9,7 +9,7 @@ compile:
 all: $(testbenches)
 
 clean:
-	rm -rf ../work/ sim*
+	rm -rf ../work/* sim*
 
 .PHONY: clean all add compile %.tb
 .DEFAULT_GOAL := all
