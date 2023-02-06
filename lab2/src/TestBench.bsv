@@ -6,6 +6,8 @@ import Randomizable::*;
 import FftCommon::*;
 import Fft::*;
 
+import Fifo::*;
+
 module mkTestBench#(Fft fft)();
     let fft_comb <- mkFftCombinational;
 
@@ -56,18 +58,14 @@ module mkTestBench#(Fft fft)();
     endrule
 
     rule timeout(init);
-        if( cycle_count == 128 * 128 * 128 ) begin
+//WTH here?
+        if( cycle_count == 128 * 128 ) begin
             $display("FAILED: Only saw %0d out of 128 outputs after %0d cycles", stream_count, cycle_count);
             $finish;
         end
+        $display("Cycle %d:", cycle_count);
         cycle_count <= cycle_count + 1;
     endrule
-endmodule
-
-(* synthesize *)
-module mkTbFftFolded();
-    let fft <- mkFftFolded;
-    mkTestBench(fft);
 endmodule
 
 (* synthesize *)
@@ -83,7 +81,77 @@ module mkTbFftElasticPipeline();
 endmodule
 
 (* synthesize *)
-module mkTbFftSuperFolded();
-    let fft <- mkFftSuperFolded4;
-    mkTestBench(fft);
+module mkTestBenchFifo();
+    Fifo#(3, Bit#(32)) referenceFifo <- mkCF3Fifo();
+    Fifo#(3, Bit#(32)) testFifo <- mkFifo();
+    Randomize#(Bit#(32)) randomVal1 <- mkGenericRandomizer;
+
+    Reg#(Bool) init <- mkReg(False);
+    Reg#(Bit#(32)) cycle_count <- mkReg(0);
+    Reg#(Bit#(32)) delay <- mkReg(0);
+    Reg#(Bit#(8)) stream_count <- mkReg(0);
+    Reg#(Bit#(8)) feed_count <- mkReg(0);
+    Reg#(Bit#(32)) enqueue3 <-mkReg(0);
+    Reg#(Bool) success <- mkReg(False);
+    rule initialize(init == False);
+        randomVal1.cntrl.init;
+        init <= True;
+    endrule
+
+    rule feed (feed_count <128 && init && (enqueue3==0) );
+       let el <- randomVal1.next;
+       referenceFifo.enq(el);
+       feed_count <= feed_count + 1;
+       testFifo.enq(el);
+       $display("Enqueuing %d in the tested fifo and the reference fifo",el);
+    endrule
+
+    rule stream (init && (enqueue3 == 0));
+        delay <= 0;
+        testFifo.deq();
+        $display("Dequeue");
+        stream_count <= stream_count + 1;
+        referenceFifo.deq();
+        let r = referenceFifo.first();
+        let t = testFifo.first();
+        if (t!=r) begin $display("FAILED: We see %d in the reference fifo and %d in your fifo", r, t); $finish; end
+    endrule
+
+    rule presucces (stream_count == 128 && init);
+        $display("On the path to success");
+        enqueue3 <= 1;
+        stream_count <= stream_count + 1;
+    endrule
+
+    rule finish(success && stream_count == 132);
+        $display("PASSED");
+        $finish();
+    endrule
+
+    rule enqueueThree (enqueue3>0 && enqueue3 < 4);
+        delay <= 0;
+        enqueue3 <= enqueue3 + 1;
+        let el <- randomVal1.next;
+        referenceFifo.enq(el);
+        feed_count <= feed_count + 1;
+        testFifo.enq(el);
+        $display("Enqueuing three %d in the tested fifo and the reference fifo",el);
+    endrule
+
+    rule dequeueThree(enqueue3 ==4);
+       $display("Enqueued three in a row");
+       enqueue3 <= 0;
+       success <= True;
+    endrule
+
+    rule deadlock (delay == 200 && init );
+        $display("FAILED It seems that your fifo is deadlocking, either we are failing to enqueue, or we enqueud some stuff in it but we can't dequeue from it.");
+        $finish;
+    endrule
+
+    rule timeout ( init);
+        delay <= delay + 1;
+        cycle_count <= cycle_count + 1;
+    endrule
 endmodule
+
