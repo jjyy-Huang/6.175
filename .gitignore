@@ -8,5 +8,13 @@ lab*/work/*
 !final/
 final/work/*
 
+!riscv/
+
+
+!init.sh
+**/bluesim/
+**/build/
+**/logs/
+
 
 !**/.gitkeep
