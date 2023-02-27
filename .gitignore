@@ -17,5 +17,6 @@ final/work/*
 **/logs/
 **/tmp/
 .Xil/
+**/verilog/
 
 !**/.gitkeep

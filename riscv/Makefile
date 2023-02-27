@@ -43,6 +43,7 @@ gen: clean
 	cp $(BSCLIB)/Verilog/RegFile.v	./verilog
 	cp $(BSCLIB)/Verilog/SizedFIFO.v	./verilog
 	cp $(BSCLIB)/Verilog/BRAM2.v	./verilog
+	cp $(BSCLIB)/Verilog/BRAM1.v	./verilog
 	bsc -vdir ./verilog/ -bdir ./tmp/ -verilog -g mkProc -u ./tmp/$(PROC).bsv
 
 VIVADO_CMD = vivado -nolog -nojournal -mode batch -source ./build_prj.tcl -tclargs
