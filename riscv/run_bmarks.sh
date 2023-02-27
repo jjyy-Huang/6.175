@@ -1,10 +1,10 @@
 #!/bin/bash
 
 asm_tests=(
+	towers
 	median
 	multiply
 	qsort
-	towers
 	vvadd
 	)
 
@@ -13,6 +13,8 @@ log_dir=logs
 wait_time=3
 
 # create bsim log dir
+
+rm -rf ${log_dir}
 mkdir -p ${log_dir}
 
 pkill bsim
@@ -26,10 +28,10 @@ for test_name in ${asm_tests[@]}; do
 		echo "ERROR: $mem_file does not exit, you need to first compile"
 		exit
 	fi
-	cp ${mem_file} bluesim/program 
+	cp ${mem_file} bluesim/program
 
 	# run test
-	make run.bluesim > ${log_dir}/${test_name}.log & # run bsim, redirect outputs to log
+	make run.bluesim > ${log_dir}/${test_name}.log # run bsim, redirect outputs to log
 	sleep ${wait_time} # wait for bsim to setup
 done
 pkill bsim

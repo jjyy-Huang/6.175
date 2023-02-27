@@ -15,6 +15,7 @@ final/work/*
 **/bluesim/
 **/build/
 **/logs/
-
+**/tmp/
+.Xil/
 
 !**/.gitkeep

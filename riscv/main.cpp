@@ -20,7 +20,7 @@
 using namespace std;
 
 static ConnectalProcRequestProxy *connectalProc= 0;
-static ConnectalMemoryInitializationProxy *memoryRequest = 0; 
+static ConnectalMemoryInitializationProxy *memoryRequest = 0;
 static Platform *platform = 0;
 static sem_t responseSem;
 volatile int run = 1;
@@ -31,7 +31,7 @@ class ConnectalProcIndication: public ConnectalProcIndicationWrapper
 public:
     virtual void sendMessage(uint32_t msg){
 		    uint32_t type = msg>>16 ;
-            	    uint32_t data = msg & ( (1>>16) - 1);
+            	    uint32_t data = msg & ( (1<<16) - 1);
 			if(type == 0) {
 				if(data == 0) {
 					fprintf(stderr, "PASSED\n");
@@ -47,10 +47,10 @@ public:
 				print_int |= uint32_t(data) << 16;
 				fprintf(stderr, "%d", print_int);
 			}
-  
+
     }
     virtual void wroteWord(uint32_t msg){sem_post(&responseSem);}
- 
+
    ConnectalProcIndication(unsigned int id) : ConnectalProcIndicationWrapper(id){}
 };
 
@@ -69,8 +69,8 @@ int main(int argc, char * const *argv) {
     connectalProc->hostToCpu(0x200);
     printf("Processor started");
     fflush(stdout);
-    // Now the processor is running we are waiting for it to be done 
-    while (run != 0){}     
+    // Now the processor is running we are waiting for it to be done
+    while (run != 0){}
     return 0;
 }
 
