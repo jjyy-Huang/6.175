@@ -33,7 +33,8 @@ module mkProc(Proc);
     CsrFile        csrf <- mkCsrFile;
 
     // FIFO between two stages
-    FIFO#(F2E) f2eFifo <- mkFIFO;
+    // using pipeline fifo means: deq < enq => ex < fetch
+    Fifo#(3, F2E) f2eFifo <- mkMyPipelineFifo;
     Ehr#(2, Bool) epochG <- mkEhr(False);
 
     Bool memReady = iMem.init.done && dMem.init.done;
@@ -42,17 +43,17 @@ module mkProc(Proc);
 
     rule fcStage if (csrf.started);
         $display("----------fetch stage----------");
-        let ppc = pcReg[0] + 4;
-        pcReg[0] <= ppc;
-        let inst = iMem.req(pcReg[0]);
+        let ppc = pcReg[1] + 4;
+        pcReg[1] <= ppc;
+        let inst = iMem.req(pcReg[1]);
         let dInst = decode(inst);
 
-        $display("pc: %h inst: (%h) expanded: ", pcReg[0], inst, showInst(inst));
+        $display("pc: %h inst: (%h) expanded: ", pcReg[1], inst, showInst(inst));
         f2eFifo.enq(F2E{
-                        pc:     pcReg[0],
+                        pc:     pcReg[1],
                         predPc: ppc,
                         dInst:  dInst,
-                        epoch:  epochG[0]});
+                        epoch:  epochG[1]});
     endrule
 
     rule exStage if (csrf.started);
@@ -67,12 +68,12 @@ module mkProc(Proc);
         Data csrVal = csrf.rd(fromMaybe(?, dInst.csr));
         f2eFifo.deq;
 
-        if (epoch == epochG[1]) begin
+        if (epoch == epochG[0]) begin
             let eInst = exec(dInst, rVal1, rVal2, exPc, exPpc, csrVal);
             if (eInst.mispredict) begin
                 $display("wrong prediction, fix it ----- rediction and thron next inst where is loaded in f2efifo.");
-                pcReg[1] <= eInst.addr;
-                epochG[1] <= !epochG[1];
+                pcReg[0] <= eInst.addr;
+                epochG[0] <= !epochG[0];
             end
 
             // memory
@@ -109,7 +110,7 @@ module mkProc(Proc);
         csrf.start(0); // only 1 core, id = 0
         $display("Start at pc 200\n");
         $fflush(stdout);
-        pcReg[0] <= startpc;
+        pcReg[1] <= startpc;
     endmethod
 
     interface iMemInit = iMem.init;
