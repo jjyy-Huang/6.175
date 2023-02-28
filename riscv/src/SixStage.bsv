@@ -17,6 +17,19 @@ import Ehr::*;
 import Btb::*;
 import Scoreboard::*;
 
+
+// bpred_bht
+// 1967
+// 1007
+
+// bpred_j
+// 2045
+// 1803
+
+// bpred_j_noloop
+// 104
+// 34
+
 // Data structure for Fetch to Decode stage
 typedef struct {
     Addr pc;
