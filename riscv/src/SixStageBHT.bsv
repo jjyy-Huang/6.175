@@ -79,6 +79,10 @@ typedef struct {
 // 104 -> 40
 // 34
 
+// bpred_ras
+// 571
+// 283
+
 // redirect msg from Execute stage
 (* synthesize *)
 module mkProc(Proc);
