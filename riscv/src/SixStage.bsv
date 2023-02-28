@@ -87,19 +87,23 @@ module mkProc(Proc);
         Addr currpc;
         if (rPipe.notEmpty) begin
             $display("[fetch] redirect");
-            fEpoch <= !fEpoch;
-            ppc = rPipe.first.correctPpc;
+            currEpoch = !fEpoch;
+            fEpoch <= currEpoch;
+            ppc = btb.predPc(rPipe.first.correctPpc);
+            currpc = rPipe.first.correctPpc;
+
             btb.update(rPipe.first.currPc, rPipe.first.correctPpc);
             rPipe.deq;
         end else begin
             currEpoch = fEpoch;
+            currpc = pc;
             ppc = btb.predPc(pc);
             fEpoch <= currEpoch;
         end
-        iMem.req(MemReq{op: Ld, addr: pc, data: ?});
+        iMem.req(MemReq{op: Ld, addr: currpc, data: ?});
 
         pc <= ppc;
-        f2d.enq(Fetch2Decode{pc: pc, predPc: ppc, epoch: fEpoch});
+        f2d.enq(Fetch2Decode{pc: currpc, predPc: ppc, epoch: currEpoch});
     endrule
 
     rule decodeStage;
