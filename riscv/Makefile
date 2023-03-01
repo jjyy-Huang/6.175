@@ -23,7 +23,7 @@ BSCLIB ?= /opt/bsc/lib
 SOFTWARE_SOCKET_NAME=/tmp/connectal$(USER)
 CONNECTALFLAGS += -D $(VPROC)
 CONNECTALFLAGS += --bscflags " -D $(VPROC) -steps-max-intervals 50 +RTS -K256M -RTS"
-CONNECTALFLAGS += --bscflags " -show-schedule"
+CONNECTALFLAGS += --bscflags " -show-schedule -aggressive-conditions -keep-fires"
 #CONNECTALFLAGS += --cxxflags="-g -std=gnu++11"
 
 include $(CONNECTALDIR)/Makefile.connectal
@@ -58,6 +58,7 @@ build:
 .PHONY: synth
 .ONESHELL:
 synth:
+	rm -rf ./build/${PROC}/
 	mkdir ./build/${PROC}/
 	export DEVICE=xc7vx485tffg1761-2
 	export SYNTH_TOP=mkProc

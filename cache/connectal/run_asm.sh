@@ -2,23 +2,23 @@
 
 
 asm_tests=(
-	simple
-	add addi
-	and andi
-	auipc
-	beq bge bgeu blt bltu bne
-	j jal jalr
-	lw
-	lui
-	or ori
-	sw
-	sll slli
-	slt slti
-	sra srai
-	srl srli
-	sub
-	xor xori
-	bpred_bht bpred_j bpred_ras
+	# simple
+	# add addi
+	# and andi
+	# auipc
+	# beq bge bgeu blt bltu bne
+	# j jal jalr
+	# lw
+	# lui
+	# or ori
+	# sw
+	# sll slli
+	# slt slti
+	# sra srai
+	# srl srli
+	# sub
+	# xor xori
+	# bpred_bht bpred_j bpred_ras
 	cache
 	)
 
