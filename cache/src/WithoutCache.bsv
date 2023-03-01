@@ -314,6 +314,10 @@ module mkProc#(Fifo#(2, DDR3_Req) ddr3ReqFifo, Fifo#(2, DDR3_Resp) ddr3RespFifo)
 
     // endrule
 
+	rule drainMemResponses( !csrf.started );
+		ddr3RespFifo.deq;
+	endrule
+
     method ActionValue#(CpuToHostData) cpuToHost if(csrf.started);
         let ret <- csrf.cpuToHost;
         return ret;
