@@ -9,6 +9,7 @@ lab*/work/*
 final/work/*
 
 !riscv/
+!cache/
 
 
 !init.sh
